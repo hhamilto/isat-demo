@@ -1,0 +1,22 @@
+{
+  "name": "isat-demo",
+  "version": "1.0.0",
+  "description": "Demo for isat",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hhamilto/isat-demo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hhamilto/isat-demo/issues"
+  },
+  "homepage": "https://github.com/hhamilto/isat-demo",
+  "dependencies": {
+    "express": "^4.12.3"
+  }
+}
