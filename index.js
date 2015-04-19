@@ -95,6 +95,15 @@ io.on('connection', function (socket) {
 					total[2] = total[2]/(charWidthScreenPixels*charHeightScreenPixels)/255
 
 					var value = _.sum(total)/3
+					if(total[0] > (total[1]+total[2])/1.26) //red
+						strToWrite += "\x1b[31m"
+					else if(total[1] > (total[0]+total[2])/1.3) //green
+						strToWrite += "\x1b[32m"
+					else if(total[2] > (total[0]+total[1])/1.8) //blue
+						strToWrite += "\x1b[34m"
+					else
+						strToWrite += "\x1b[0m"
+
 					if(value>.3){
 						strToWrite += paints[0]
 					}else if(value>.2){
