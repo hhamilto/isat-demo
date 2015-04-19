@@ -1,0 +1,38 @@
+
+body {
+	background: #33F
+}
+
+#login input {
+	width:100%;
+	height: 100px;
+	font-size: 70px;
+	color:white;
+	border: none;
+	border-bottom: 5px solid black;
+	background: none;
+}
+
+#login button {
+	width:100%;
+	height: 100px;
+	margin-top:30px;
+	background: #0A0;
+	color:white;
+	font-size: 70px;
+	border: none;
+	border-radius: 20px;
+	cursor: pointer;
+}
+
+#login button:hover {
+	cursor: pointer;
+	background: #090;
+	color: #EEE;
+	box-shadow: inset 0 50px 80px -60px rgba(0,0,0,.5);
+}
+
+.hidden {
+	display: none;
+} 
+
