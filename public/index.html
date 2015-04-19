@@ -19,6 +19,7 @@
 		</div>
 		<canvas id="canvas" style="display:none">
 		</canvas>
+		<marquee id='nick-display'></marquee>
 	</div>
 	<script src="socket.io/socket.io.js">
 	</script>
@@ -30,6 +31,7 @@
 		var nameInput = document.getElementById('input-name')
 		var login = document.getElementById('login')
 		var videoContainer = document.getElementById('video-container')
+		var nickDisplay = document.getElementById('nick-display')
 		var doTheNextThang = function(e){
 			e.preventDefault()
 			login.setAttribute('class','hidden')
@@ -37,6 +39,7 @@
 			var name = nameInput.value
 			socket.emit('name', name)
 			setInterval(takepicture,333)
+			nickDisplay.textContent="Your nickname is: "+name
 		}
 		button.addEventListener('click', doTheNextThang)
 		form.addEventListener('submit', doTheNextThang)

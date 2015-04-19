@@ -57,6 +57,7 @@ io.on('connection', function (socket) {
 	})
 	var fd
 	socket.on('name', function (name) {
+		if(!name) return; //no empty names
 		fs.unlink("/tmp/streams/"+name, function(err){
 			if(err && err.code != 'ENOENT') throw Error(err)
 			cp.exec('mkfifo /tmp/streams/'+name,function(err){
@@ -99,7 +100,7 @@ io.on('connection', function (socket) {
 				})
 			}))
 
-			var strToWrite = '\n'
+			var strToWrite = '\n\n\n\n\n\n\n\n\n'
 			var charray = _.each(_.times(lines), function(line){
 				last = -1;
 				_.each(_.times(Math.floor(width/imagePixelsPerColumn)), function(col){
