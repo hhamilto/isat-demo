@@ -110,7 +110,7 @@ var socket = io('');
       clearphoto();
     }
   }
-  setInterval(takepicture, 333)
+  setInterval(takepicture, 1000)
 
   // Set up our event listener to run the startup process
   // once loading is complete.

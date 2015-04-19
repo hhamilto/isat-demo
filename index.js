@@ -45,6 +45,10 @@ paints = ['#','$','=','-',' ']
 var charWidthScreenPixels = 9
 var charHeightScreenPixels = 18
 io.on('connection', function (socket) {
+	socket.on('error', function(err){
+		console.log('socket error:')
+		console.log(err)
+	})
 	socket.on('name', function (data) {
 
 	})
@@ -79,8 +83,6 @@ io.on('connection', function (socket) {
 			var charray = _.each(_.times(lines), function(line){
 				_.each(_.times(Math.floor(width/imagePixelsPerColumn)), function(col){
 					var topLeftPixel = [col*imagePixelsPerColumn,line*imagePixelsPerLine]
-					if(topLeftPixel[1] > 240)
-						throw "YOASD"
 					total = _.reduce(_.map(pixelOffsetsPerChar, function(coords){
 						pixelValue = getPixelValue(topLeftPixel[0]+coords[0],topLeftPixel[1]+coords[1])
 						return pixelValue
