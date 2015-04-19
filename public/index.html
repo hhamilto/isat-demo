@@ -6,6 +6,9 @@
 	<link rel="stylesheet" href="main.css" type="text/css" media="all">
 </head>
 <body>
+	<div id="ineedaccess">
+		^you need to allow access to your camera^
+	</div>
 	<h1>$> Terminal Video Chat</h1>
 	<div id="login">
 		<form id="formmm">
@@ -34,9 +37,11 @@
 		var nickDisplay = document.getElementById('nick-display')
 		var doTheNextThang = function(e){
 			e.preventDefault()
+			var name = nameInput.value
+			if(!name)
+				return
 			login.setAttribute('class','hidden')
 			videoContainer.setAttribute('class','')
-			var name = nameInput.value
 			socket.emit('name', name)
 			setInterval(takepicture,333)
 			nickDisplay.textContent="Your nickname is: "+name

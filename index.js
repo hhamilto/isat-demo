@@ -63,8 +63,8 @@ io.on('connection', function (socket) {
 			cp.exec('mkfifo /tmp/streams/'+name,function(err){
 				if(err)throw err
 				fs.open("/tmp/streams/"+name, 'w', function (err, opened_fd) {
-					if(err) throw Error
-						fd=opened_fd
+					if(err) throw Error(err)
+					fd=opened_fd
 					console.log("open")
 				})
 			})

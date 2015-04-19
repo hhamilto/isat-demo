@@ -1,5 +1,5 @@
 var socket = io('')
-
+accessAllowed = false;
 takepicture = (function() {
   // The width and height of the captured photo. We will set the
   // width to the value defined here, but the height will be
@@ -35,6 +35,9 @@ takepicture = (function() {
         video: true
       },
       function(stream) {
+
+        var gimmeaccess = document.getElementById('ineedaccess');
+        gimmeaccess.setAttribute('class','hidden');
         if (navigator.mozGetUserMedia) {
           video.mozSrcObject = stream
         } else {
@@ -80,7 +83,6 @@ takepicture = (function() {
     canvas.width = width
     canvas.height = height
     context.drawImage(video, 0, 0, width, height)
-  
     var data = canvas.toDataURL('image/png')
     socket.emit('photo', data)
   }
