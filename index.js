@@ -43,7 +43,7 @@ var image = require('get-image-data')
 
 //cusor size: 9x18
 
-paints = ['#','$','-',' ']
+paints = ['#','$','=','-',' ']
 
 var charWidthScreenPixels = 9
 var charHeightScreenPixels = 18
@@ -65,36 +65,63 @@ io.on('connection', function (socket) {
 
 			var getPixelValue = function(x,y) {
 				var baseOffSet = (y*width+x)*4
-				ans = (data[baseOffSet]+data[baseOffSet+1]+data[baseOffSet+2])/3
-				if(isNaN(ans)){
-					console.log(x,y)
-					process.exit(1)
-				}
+				ans = [data[baseOffSet],data[baseOffSet+1],data[baseOffSet+2]]
 				return ans
 			}
-			var pixelOffsetsPerChar = _.flatten(_.map(_.times(charHeightScreenPixels), function(y){
-				return _.map(_.times(charWidthScreenPixels), function(x){
+
+
+			var pixelOffsetsPerChar = _.flatten(_.map(_.times(imagePixelsPerColumn), function(x){
+				return _.map(_.times(imagePixelsPerLine), function(y){
 					return [x,y]
 				})
 			}))
+
 			var charray = _.map(_.times(lines), function(line){
-				return _.map(_.times(cols), function(col){
+				return _.map(_.times(Math.floor(width/imagePixelsPerColumn)), function(col){
 					var topLeftPixel = [col*imagePixelsPerColumn,line*imagePixelsPerLine]
 					if(topLeftPixel[1] > 240)
 						throw "YOASD"
 					//console.log(topLeftPixel)
-					total = _.add(_.map(pixelOffsetsPerChar, function(coords){
-						console.log("about to get value")
-						console.log(topLeftPixel[1])
+					total = _.reduce(_.map(pixelOffsetsPerChar, function(coords){
+						//console.log("about to get value")
+						//console.log(topLeftPixel[0],topLeftPixel[1])
 						pixelValue = getPixelValue(topLeftPixel[0]+coords[0],topLeftPixel[1]+coords[1])
 						return pixelValue
-					}))
-					total = total/(charWidthScreenPixels*charHeightScreenPixels)/255
-					return total;
+					}), function(prev, cur){
+						prev[0] += cur[0]
+						prev[1] += cur[1]
+						prev[2] += cur[2]
+						return prev
+					})
+					total[0] = total[0]/(charWidthScreenPixels*charHeightScreenPixels)/255
+					total[1] = total[1]/(charWidthScreenPixels*charHeightScreenPixels)/255
+					total[2] = total[2]/(charWidthScreenPixels*charHeightScreenPixels)/255
+					return total
 				})
 			})
-			//console.log(charray[0])
-			//console.log(width,height)
+			// console.log(charray[0])
+			// console.log(width,height)
+			_.each(_.times(lines), function(line){
+				_.each(_.times(cols), function(col){
+
+					if(charray[line][col]){
+						var value = _.sum(charray[line][col])/3
+						if(value>.3){
+							process.stdout.write(paints[0]);
+						}else if(value>.2){
+							process.stdout.write(paints[1]);
+						}else if(value>.13){
+							process.stdout.write(paints[2]);
+						}else if(value>.01){
+							process.stdout.write(paints[3]);
+						}else{
+							process.stdout.write(paints[4]);
+						}
+					}else{
+						process.stdout.write('+');
+					}
+				})
+			})
 
 			/*for (var i = 0, l = data.length; i < l; i += 4) {
 
