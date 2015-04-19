@@ -31,7 +31,7 @@ var updateTermSize = function(){
 
 app.use(express.static(__dirname + '/public'))
 
-fs.mkdir(__dirname+'/streams', function(err){
+fs.mkdir('/tmp/streams', function(err){
 	if(err && err.code != 'EEXIST') throw err
 })
 
