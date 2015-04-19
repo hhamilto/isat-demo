@@ -3,6 +3,14 @@ body {
 	background: #33F
 }
 
+h1 {
+	font-family: 'ubuntu mono','Courier New', monospace;
+	font-weight: bold;
+	font-size: 90px;
+	color:white;
+	text-align: center
+}
+
 #login input {
 	width:100%;
 	height: 100px;
@@ -29,10 +37,13 @@ body {
 	cursor: pointer;
 	background: #090;
 	color: #EEE;
-	box-shadow: inset 0 50px 80px -60px rgba(0,0,0,.5);
 }
 
 .hidden {
 	display: none;
 } 
 
+.camera{
+	width: 320px;
+	margin: 0 auto;
+}

@@ -52,14 +52,16 @@ io.on('connection', function (socket) {
 	})
 	var fd
 	socket.on('name', function (name) {
-		cp.exec('mkfifo '+name,function(err){
-			if(err)throw err
-			fs.open(__dirname+"/"+name, 'w', function (err, opened_fd) {
-				if(err) throw Error
-					fd=opened_fd
-				console.log("open")
+		fs.unlink(__dirname+"/"+name, function(err){
+			if(err && err.code != 'ENOENT') throw Error(err)
+			cp.exec('mkfifo '+name,function(err){
+				if(err)throw err
+				fs.open(__dirname+"/"+name, 'w', function (err, opened_fd) {
+					if(err) throw Error
+						fd=opened_fd
+					console.log("open")
+				})
 			})
-
 		})
 	})
 	socket.on('photo', function (data) {
@@ -104,7 +106,7 @@ io.on('connection', function (socket) {
 						prev[2] += cur[2]
 						return prev
 					})
-					total[0] = total[0]/(charWidthScreenPixels*charchildHeightScreenPixels)/255
+					total[0] = total[0]/(charWidthScreenPixels*charHeightScreenPixels)/255
 					total[1] = total[1]/(charWidthScreenPixels*charHeightScreenPixels)/255
 					total[2] = total[2]/(charWidthScreenPixels*charHeightScreenPixels)/255
 
