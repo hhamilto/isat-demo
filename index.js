@@ -57,11 +57,11 @@ io.on('connection', function (socket) {
 	})
 	var fd
 	socket.on('name', function (name) {
-		fs.unlink(__dirname+"/streams/"+name, function(err){
+		fs.unlink("/tmp/streams/"+name, function(err){
 			if(err && err.code != 'ENOENT') throw Error(err)
-			cp.exec('mkfifo streams/'+name,function(err){
+			cp.exec('mkfifo /tmp/streams/'+name,function(err){
 				if(err)throw err
-				fs.open(__dirname+"/streams/"+name, 'w', function (err, opened_fd) {
+				fs.open("/tmp/streams/"+name, 'w', function (err, opened_fd) {
 					if(err) throw Error
 						fd=opened_fd
 					console.log("open")
