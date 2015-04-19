@@ -1,21 +1,45 @@
 <!doctype html>
 <html>
 <head>
-    <title>Terminal Chat</title>
-    <meta charset='utf-8'>
-    <link rel="stylesheet" href="main.css" type="text/css" media="all">
-    <script src="socket.io/socket.io.js">
-    </script>
-    <script src="capture.js">
-    </script>
+	<title>Terminal Chat</title>
+	<meta charset='utf-8'>
+	<link rel="stylesheet" href="main.css" type="text/css" media="all">
 </head>
 <body>
-    <div class="contentarea">
-        <div class="camera">
-        <video id="video">Video stream not available.</video>
-        </div>
-        <canvas id="canvas" style="display:none">
-        </canvas>
-    </div>
+	<div id="login">
+		<form id="formmm">
+			<input id="input-name" type="text" placeholder="Enter Your Name..."/>
+			<button id="submit-button" type="submit"> Chat &raquo; </button>
+		</form>
+	</div>
+	<div id="video-container" class="hidden">
+		<div class="camera">
+		<video id="video">Video stream not available.</video>
+		</div>
+		<canvas id="canvas" style="display:none">
+		</canvas>
+	</div>
+	<script src="socket.io/socket.io.js">
+	</script>
+	<script src="capture.js">
+	</script>
+	<script type="text/javascript">
+		var button = document.getElementById('submit-button')
+		var form = document.getElementById('formmm')
+		var nameInput = document.getElementById('input-name')
+		var login = document.getElementById('login')
+		var videoContainer = document.getElementById('video-container')
+		var doTheNextThang = function(e){
+			e.preventDefault()
+			login.setAttribute('class','hidden')
+			videoContainer.setAttribute('class','')
+			var name = nameInput.value
+			socket.emit('name', name)
+			setInterval(takepicture,333)
+		}
+		button.addEventListener('click', doTheNextThang)
+		form.addEventListener('submit', doTheNextThang)
+
+	</script>
 </body>
 </html>

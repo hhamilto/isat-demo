@@ -1,13 +1,14 @@
 var http = require('http')
 var _ = require('lodash')
+var net = require('net')
 
 var express = require('express')
 var app = express()
 var fs = require('fs')
 
-var spawn = require('child_process').spawn
+var cp = require('child_process')
 function getTermSize(cb){
-    spawn('resize').stdout.on('data', function(data){
+    cp.spawn('resize').stdout.on('data', function(data){
         data = String(data)
         var lines = data.split('\n'),
             cols = Number(lines[0].match(/^COLUMNS=([0-9]+);$/)[1]),
@@ -24,7 +25,7 @@ var updateTermSize = function(){
 	})
 }
 updateTermSize()
-setInterval(updateTermSize, 5000)
+setInterval(updateTermSize, 10000)
 
 app.use(express.static(__dirname + '/public'))
 
@@ -49,10 +50,20 @@ io.on('connection', function (socket) {
 		console.log('socket error:')
 		console.log(err)
 	})
-	socket.on('name', function (data) {
+	var fd
+	socket.on('name', function (name) {
+		cp.exec('mkfifo '+name,function(err){
+			if(err)throw err
+			fs.open(__dirname+"/"+name, 'w', function (err, opened_fd) {
+				if(err) throw Error
+					fd=opened_fd
+				console.log("open")
+			})
 
+		})
 	})
 	socket.on('photo', function (data) {
+		if(!fd) return
 		var decoded = dataUriToBuffer(data)
 		image(decoded, function(error, info) {
 			var height = info.height
@@ -81,6 +92,7 @@ io.on('connection', function (socket) {
 
 			var strToWrite = ''
 			var charray = _.each(_.times(lines), function(line){
+				last = -1;
 				_.each(_.times(Math.floor(width/imagePixelsPerColumn)), function(col){
 					var topLeftPixel = [col*imagePixelsPerColumn,line*imagePixelsPerLine]
 					total = _.reduce(_.map(pixelOffsetsPerChar, function(coords){
@@ -92,7 +104,7 @@ io.on('connection', function (socket) {
 						prev[2] += cur[2]
 						return prev
 					})
-					total[0] = total[0]/(charWidthScreenPixels*charHeightScreenPixels)/255
+					total[0] = total[0]/(charWidthScreenPixels*charchildHeightScreenPixels)/255
 					total[1] = total[1]/(charWidthScreenPixels*charHeightScreenPixels)/255
 					total[2] = total[2]/(charWidthScreenPixels*charHeightScreenPixels)/255
 
@@ -101,7 +113,7 @@ io.on('connection', function (socket) {
 						strToWrite += "\x1b[31m"
 					else if(total[1] > (total[0]+total[2])/1.3) //green
 						strToWrite += "\x1b[32m"
-					else if(total[2] > (total[0]+total[1])/1.8) //blue
+					else if(total[2] > (total[0]+total[1])/1.6) //blue
 						strToWrite += "\x1b[34m"
 					else
 						strToWrite += "\x1b[0m"
@@ -121,7 +133,7 @@ io.on('connection', function (socket) {
 				strToWrite += "\n"
 			})
 
-			process.stdout.write(strToWrite.substr(0,strToWrite.length-1))
+			fs.write(fd,strToWrite.substr(0,strToWrite.length-1), function(viking_error){})
 		})
 	})
 })
