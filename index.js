@@ -99,7 +99,7 @@ io.on('connection', function (socket) {
 				})
 			}))
 
-			var strToWrite = ''
+			var strToWrite = '\n'
 			var charray = _.each(_.times(lines), function(line){
 				last = -1;
 				_.each(_.times(Math.floor(width/imagePixelsPerColumn)), function(col){
