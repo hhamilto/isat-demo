@@ -19,10 +19,10 @@ function getTermSize(cb){
     })
 }//credit: http://tobyho.com/2011/10/15/getting-terminal-size-in-node/
 var cols,lines
-;updateTermSize = function(){
+var updateTermSize = function(){
 	getTermSize(function(cb_cols,cb_lines){
 		cols = cb_cols
-		lines = cb_lines
+		lines = cb_lines+1
 	})
 }
 updateTermSize()
@@ -58,7 +58,6 @@ io.on('connection', function (socket) {
 			var imagePixelsPerLine = Math.floor(height/lines)
 			var imagePixelsPerColumn = Math.floor(imagePixelsPerLine/2)
 			var imageColumns = Math.floor(width/imagePixelsPerColumn)
-			console.log(imagePixelsPerLine, imagePixelsPerColumn, imageColumns)
 
 			if(imageColumns > cols)
 				throw Error("fuck")
@@ -76,15 +75,13 @@ io.on('connection', function (socket) {
 				})
 			}))
 
-			var charray = _.map(_.times(lines), function(line){
-				return _.map(_.times(Math.floor(width/imagePixelsPerColumn)), function(col){
+			var strToWrite = ''
+			var charray = _.each(_.times(lines), function(line){
+				_.each(_.times(Math.floor(width/imagePixelsPerColumn)), function(col){
 					var topLeftPixel = [col*imagePixelsPerColumn,line*imagePixelsPerLine]
 					if(topLeftPixel[1] > 240)
 						throw "YOASD"
-					//console.log(topLeftPixel)
 					total = _.reduce(_.map(pixelOffsetsPerChar, function(coords){
-						//console.log("about to get value")
-						//console.log(topLeftPixel[0],topLeftPixel[1])
 						pixelValue = getPixelValue(topLeftPixel[0]+coords[0],topLeftPixel[1]+coords[1])
 						return pixelValue
 					}), function(prev, cur){
@@ -96,43 +93,24 @@ io.on('connection', function (socket) {
 					total[0] = total[0]/(charWidthScreenPixels*charHeightScreenPixels)/255
 					total[1] = total[1]/(charWidthScreenPixels*charHeightScreenPixels)/255
 					total[2] = total[2]/(charWidthScreenPixels*charHeightScreenPixels)/255
-					return total
-				})
-			})
-			// console.log(charray[0])
-			// console.log(width,height)
-			_.each(_.times(lines), function(line){
-				_.each(_.times(cols), function(col){
 
-					if(charray[line][col]){
-						var value = _.sum(charray[line][col])/3
-						if(value>.3){
-							process.stdout.write(paints[0]);
-						}else if(value>.2){
-							process.stdout.write(paints[1]);
-						}else if(value>.13){
-							process.stdout.write(paints[2]);
-						}else if(value>.01){
-							process.stdout.write(paints[3]);
-						}else{
-							process.stdout.write(paints[4]);
-						}
+					var value = _.sum(total)/3
+					if(value>.3){
+						strToWrite += paints[0]
+					}else if(value>.2){
+						strToWrite += paints[1]
+					}else if(value>.10){
+						strToWrite += paints[2]
+					}else if(value>.04){
+						strToWrite += paints[3]
 					}else{
-						process.stdout.write('+');
+						strToWrite += paints[4]
 					}
 				})
+				strToWrite += "\n"
 			})
 
-			/*for (var i = 0, l = data.length; i < l; i += 4) {
-
-				var i = 10*4
-				var red = data[i]
-				var green = data[i + 1]
-				var blue = data[i + 2]
-				var alpha = data[i + 3]
-				console.log(red,green,blue,alpha)	
-			}*/
+			process.stdout.write(strToWrite.substr(0,strToWrite.length-1))
 		})
-		fs.writeFileSync('fuck.png', decoded)
 	});
 });

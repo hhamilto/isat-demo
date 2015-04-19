@@ -1,4 +1,4 @@
-var socket = io('http://localhost:3000');
+var socket = io('');
 
 (function() {
   // The width and height of the captured photo. We will set the
@@ -97,6 +97,7 @@ var socket = io('http://localhost:3000');
   // other changes before drawing it.
 
   function takepicture() {
+    console.log("wat")
     var context = canvas.getContext('2d');
     if (width && height) {
       canvas.width = width;
@@ -104,12 +105,12 @@ var socket = io('http://localhost:3000');
       context.drawImage(video, 0, 0, width, height);
     
       var data = canvas.toDataURL('image/png');
-      photo.setAttribute('src', data);
       socket.emit('photo', data)
     } else {
       clearphoto();
     }
   }
+  setInterval(takepicture, 300)
 
   // Set up our event listener to run the startup process
   // once loading is complete.
