@@ -1,11 +1,9 @@
-var WebSocketServer = require('websocket').server
 var http = require('http')
 var _ = require('lodash')
 
 var express = require('express')
 var app = express()
 var fs = require('fs')
-var isat = require('isat')
 
 var spawn = require('child_process').spawn
 function getTermSize(cb){
@@ -28,7 +26,6 @@ var updateTermSize = function(){
 updateTermSize()
 setInterval(updateTermSize, 5000)
 
-app.use(isat)
 app.use(express.static(__dirname + '/public'))
 
 
