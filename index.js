@@ -18,14 +18,16 @@ function getTermSize(cb){
     })
 }//credit: http://tobyho.com/2011/10/15/getting-terminal-size-in-node/
 var cols,lines
+
+cols = 92, lines = 21
+
 var updateTermSize = function(){
 	getTermSize(function(cb_cols,cb_lines){
 		cols = cb_cols
 		lines = cb_lines+1
 	})
 }
-updateTermSize()
-setInterval(updateTermSize, 10000)
+//updateTermSize()
 
 app.use(express.static(__dirname + '/public'))
 
