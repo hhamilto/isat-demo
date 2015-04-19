@@ -31,6 +31,9 @@ var updateTermSize = function(){
 
 app.use(express.static(__dirname + '/public'))
 
+fs.mkdir(__dirname+'/streams', function(err){
+	if(err && err.code != 'EEXIST') throw err
+})
 
 var server = http.createServer(app).listen(3000, function(){
 	console.log("listenin on 3000")
@@ -54,11 +57,11 @@ io.on('connection', function (socket) {
 	})
 	var fd
 	socket.on('name', function (name) {
-		fs.unlink(__dirname+"/"+name, function(err){
+		fs.unlink(__dirname+"/streams/"+name, function(err){
 			if(err && err.code != 'ENOENT') throw Error(err)
-			cp.exec('mkfifo '+name,function(err){
+			cp.exec('mkfifo streams/'+name,function(err){
 				if(err)throw err
-				fs.open(__dirname+"/"+name, 'w', function (err, opened_fd) {
+				fs.open(__dirname+"/streams/"+name, 'w', function (err, opened_fd) {
 					if(err) throw Error
 						fd=opened_fd
 					console.log("open")
@@ -67,8 +70,10 @@ io.on('connection', function (socket) {
 		})
 	})
 	socket.on('photo', function (data) {
+		if(!/^data:.+,.+/.test(data)) return;
 		if(!fd) return
 		var decoded = dataUriToBuffer(data)
+
 		image(decoded, function(error, info) {
 			var height = info.height
 			var width = info.width
