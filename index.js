@@ -48,6 +48,9 @@ paints = ['#','$','=','-',' ']
 var charWidthScreenPixels = 9
 var charHeightScreenPixels = 18
 io.on('connection', function (socket) {
+	socket.on('name', function (data) {
+
+	})
 	socket.on('photo', function (data) {
 		var decoded = dataUriToBuffer(data)
 		image(decoded, function(error, info) {
@@ -121,5 +124,5 @@ io.on('connection', function (socket) {
 
 			process.stdout.write(strToWrite.substr(0,strToWrite.length-1))
 		})
-	});
-});
+	})
+})
