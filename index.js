@@ -1,6 +1,7 @@
 var http = require('http')
 var _ = require('lodash')
 var net = require('net')
+var util = require('util')
 
 var express = require('express')
 var app = express()
@@ -39,6 +40,51 @@ var server = http.createServer(app).listen(3000, function(){
 	console.log("listenin on 3000")
 })
 
+var nicks = {}
+var getNickObj= function(name){
+	return nicks[name] || (nicks[name] = {netSock:null, websocket: null})
+}
+var nameRegex = /^(\w+)\r?\n/
+var telnetServer = net.createServer(function(c) { //'connection' listener
+	console.log('client connected')
+	c.resume()
+	var requestedName = ''
+	var isNamed = false
+	c.on('data', function(data){
+		data = data.toString()
+		if(!isNamed){
+			requestedName += data
+			if(nameRegex.exec(requestedName) != null){
+				console.log('as')
+				requestedName = nameRegex.exec(requestedName)[1]
+				console.log(util.inspect(nameRegex.exec(requestedName)))
+				var nickObj = getNickObj(requestedName)
+				nickObj.netSock = c
+			}
+			console.log('rn: *'+requestedName+'*')
+			isNamed = true
+		}else{
+			var nickObj = getNickObj(requestedName)
+			if(!nickObj.websocket) return
+			nickObj.websocket.emit('data', data.toString())
+		}
+	})
+	c.on('end', function(){
+		if(nicks[requestedName]){
+			nicks[requestedName].netSock = null;
+		}
+	})
+	c.write("\r\n\r\n\r\n\r\n")
+	c.write("##########################################\r\n")
+	c.write("#    WELCOME TO THE TERMINAL CHAT APP    #\r\n")
+	c.write("##########################################\r\n")
+	c.write("Once connected, you can tryp messages to your partner\r\n")
+	c.write("Enter the name of your partner: ")
+});
+telnetServer.listen(6666, function() { //'listening' listener
+	console.log('listenin on 6666')
+});
+
 
 var io = require('socket.io')(server)
 var dataUriToBuffer = require('data-uri-to-buffer')
@@ -55,24 +101,15 @@ io.on('connection', function (socket) {
 		console.log('socket error:')
 		console.log(err)
 	})
-	var fd
+	var nickObj
 	socket.on('name', function (name) {
-		if(!name) return; //no empty names
-		fs.unlink("/tmp/streams/"+name, function(err){
-			if(err && err.code != 'ENOENT') throw Error(err)
-			cp.exec('mkfifo /tmp/streams/'+name,function(err){
-				if(err)throw err
-				fs.open("/tmp/streams/"+name, 'w', function (err, opened_fd) {
-					if(err) throw Error(err)
-					fd=opened_fd
-					console.log("open")
-				})
-			})
-		})
+		nickObj = getNickObj(name)
+		nickObj.websocket = socket
 	})
-	socket.on('photo', function (data) {
+	socket.on('photo', _.throttle(function (data) {
 		if(!/^data:.+,.+/.test(data)) return;
-		if(!fd) return
+		if(!nickObj) return
+		if(!nickObj.netSock) return
 		var decoded = dataUriToBuffer(data)
 
 		image(decoded, function(error, info) {
@@ -142,8 +179,10 @@ io.on('connection', function (socket) {
 				})
 				strToWrite += "\n"
 			})
-
-			fs.write(fd,strToWrite.substr(0,strToWrite.length-1), function(viking_error){})
+			if(!nickObj.netSock) return
+			nickObj.netSock.write(strToWrite.substr(0,strToWrite.length-1), function(viking_error){
+				if(viking_error) throw viking_error
+			})
 		})
-	})
+	}, 400))
 })

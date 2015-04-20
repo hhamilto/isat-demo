@@ -9,6 +9,9 @@
 	<div id="ineedaccess">
 		^you need to allow access to your camera^
 	</div>
+	<a id="help" href="/help.html">
+		HELP 
+	</a>
 	<h1>$> Terminal Video Chat</h1>
 	<div id="login">
 		<form id="formmm">
@@ -23,6 +26,7 @@
 		<canvas id="canvas" style="display:none">
 		</canvas>
 		<marquee id='nick-display'></marquee>
+		<pre id='chat-box'></pre>
 	</div>
 	<script src="socket.io/socket.io.js">
 	</script>
@@ -35,6 +39,10 @@
 		var login = document.getElementById('login')
 		var videoContainer = document.getElementById('video-container')
 		var nickDisplay = document.getElementById('nick-display')
+		var chatBox = document.getElementById('chat-box')
+		socket.on('data', function(data){
+			chatBox.textContent = chatBox.textContent+data
+		})
 		var doTheNextThang = function(e){
 			e.preventDefault()
 			var name = nameInput.value
